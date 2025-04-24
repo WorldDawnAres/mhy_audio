@@ -6,7 +6,7 @@ def get_base_path():
         return os.path.dirname(sys.executable)
     return os.path.dirname(os.path.abspath(__file__))
 
-download_directory = os.path.join(get_base_path(), "yuan_audio_ko")
+download_directory = os.path.join(get_base_path(), "bentie_audio_jp")
 os.makedirs(download_directory, exist_ok=True)
 
 def clean_filename(filename):
@@ -35,7 +35,7 @@ async def download_audio(session, audio_url, audio_file_name, retries=3,log_func
                 print(f"放弃下载: {audio_file_name}")
 
 async def fetch_character_data(session, character_name,log_func=None):
-    new_url = f"https://genshin-impact.fandom.com/wiki/{character_name}/Voice-Overs/Korean"
+    new_url = f"https://honkai-star-rail.fandom.com/wiki/{character_name}/Voice-Overs/Japanese"
     character_folder = os.path.join(download_directory, character_name)
     os.makedirs(character_folder, exist_ok=True)
 
@@ -60,18 +60,18 @@ async def fetch_character_data(session, character_name,log_func=None):
     for row in rows:
         td = row.find("td")
         if td:
-            audio_btn = td.find("span", class_="audio-button custom-theme focusable")
-            zh_text = td.find("span", lang="ko")
+            audio_btn = td.find("span", class_="audio-button custom-theme hidden")
+            jp_text = td.find("span", lang="ja")
             div = row.find("div")
 
-            if audio_btn and zh_text and div:
+            if audio_btn and jp_text and div:
                 link = audio_btn.find("a", class_="internal")
                 if link:
                     audio_url = link["href"]
                     audio_title = clean_filename(div.get("id", "unknown"))
                     audio_file_name = os.path.join(character_folder, f"{audio_title}.ogg")
                     text_file_name = os.path.splitext(audio_file_name)[0] + ".txt"
-                    text_content = zh_text.get_text(strip=True)
+                    text_content = jp_text.get_text(strip=True)
 
                     if os.path.exists(audio_file_name):
                         with open(text_file_name, 'w', encoding='utf-8') as f:

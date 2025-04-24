@@ -1,25 +1,20 @@
-import sys, os, asyncio, importlib
+import sys, os, asyncio
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QMessageBox, QTextEdit,
-    QWidget, QVBoxLayout, QMenu
+    QApplication, QMainWindow, QMessageBox,
+    QWidget, QVBoxLayout
 )
-from PySide6.QtGui import QFont, QAction, QIcon
+from PySide6.QtGui import QAction, QIcon
 from qasync import QEventLoop, asyncSlot
+from functools import partial
 
 from tool.character_selector import CharacterSelector
-from tool.config import CHARACTER_FILE,get_resource_path
+from tool.config import get_resource_path,CHARACTER_FILE_YUAN,CHARACTER_FILE_BENTIE
 from tool.LogWidget import LogWidget
-
-def load_all_characters():
-    if not os.path.exists(CHARACTER_FILE):
-        return []
-    with open(CHARACTER_FILE, "r", encoding="utf-8") as f:
-        return [line.strip() for line in f if line.strip()]
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("语音下载器主程序")
+        self.setWindowTitle("语音下载器")
         self.resize(700, 500)
 
         self.setWindowIcon(QIcon(get_resource_path("icon/icon.ico")))
@@ -40,9 +35,23 @@ class MainWindow(QMainWindow):
     def init_menu(self):
         menubar = self.menuBar()
 
-        select_action = QAction("选择角色", self)
-        select_action.triggered.connect(self.open_character_selector)
-        menubar.addAction(select_action)
+        def on_game_selected(game_key):
+            self.open_character_selector(game_key)
+
+        self.selected_game = None
+        self.selected_characters = []
+
+        select_menu = menubar.addMenu("选择角色")
+
+        games = {
+            "原神": "yuan",
+            "崩铁": "bentie",
+        }
+
+        for game_label, game_key in games.items():
+            action = QAction(game_label, self)
+            action.triggered.connect(partial(on_game_selected, game_key))
+            select_menu.addAction(action)
 
         download_menu = menubar.addMenu("下载语音")
 
@@ -66,9 +75,10 @@ class MainWindow(QMainWindow):
         about_action.triggered.connect(self.show_about)
         menubar.addAction(about_action)
 
-    def open_character_selector(self):
-        selector = CharacterSelector(selected_callback=self.receive_selection)
-        selector.exec()
+    def open_character_selector(self, game_name):
+        self.selected_game = game_name
+        dialog = CharacterSelector(self.receive_selection, self.selected_game)
+        dialog.exec()
 
     def receive_selection(self, selected):
         self.selected_characters = selected
@@ -80,41 +90,75 @@ class MainWindow(QMainWindow):
             reply = QMessageBox.question(
                 self,
                 "未选择角色",
-                "你尚未选择任何角色，是否下载全部角色？",
+                "你尚未选择任何角色，程序将默认下载原神全部角色，是否下载全部角色？",
                 QMessageBox.Yes | QMessageBox.No
             )
             if reply == QMessageBox.Yes:
-                self.selected_characters = load_all_characters()
+                if self.selected_game == "yuan":
+                    CHARACTER_FILE = CHARACTER_FILE_YUAN
+                elif self.selected_game == "bentie":
+                    CHARACTER_FILE = CHARACTER_FILE_BENTIE
+                else:
+                    CHARACTER_FILE = CHARACTER_FILE_YUAN
+
+                self.selected_characters = self.load_character_list(CHARACTER_FILE)
             else:
                 return
 
-        self.log_widget.append_text(f"开始下载语音文件（语言：{language}）...")
+        self.log_widget.append_text(f"开始下载语音文件（游戏：{self.selected_game}，语言：{language}）...")
 
-        if language == 'zh':
-            import yuan.yuan_audio_download_zh as download_module
-        elif language == 'en':
-            import yuan.yuan_audio_download_en as download_module
-        elif language == 'jp':
-            import yuan.yuan_audio_download_jp as download_module
-        elif language == 'ko':
-            import yuan.yuan_audio_download_ko as download_module
-        else:
-            self.log_widget.append_text(f"不支持的语言：{language}")
+        if not self.selected_game:
+            self.log_widget.append_text("请先选择游戏！")
             return
 
+        try:
+            if self.selected_game == "yuan":
+                if language == 'zh':
+                    import yuan.yuan_audio_download_zh as download_module
+                elif language == 'en':
+                    import yuan.yuan_audio_download_en as download_module
+                elif language == 'jp':
+                    import yuan.yuan_audio_download_jp as download_module
+                elif language == 'ko':
+                    import yuan.yuan_audio_download_ko as download_module
+                else:
+                    raise ImportError("语言不支持")
+            elif self.selected_game == "bentie":
+                if language == 'zh':
+                    import bentie.bentie_audio_download_zh as download_module
+                elif language == 'en':
+                    import bentie.bentie_audio_download_en as download_module
+                elif language == 'jp':
+                    import bentie.bentie_audio_download_jp as download_module
+                elif language == 'ko':
+                    import bentie.bentie_audio_download_ko as download_module
+                else:
+                    raise ImportError("语言不支持")
+            else:
+                raise ImportError("未知游戏标记")
+
+        except ImportError as e:
+            self.log_widget.append_text(f"导入下载模块失败：{e}")
+            return
+        
         try:
             await download_module.download_all(self.selected_characters, log_func=self.log_widget.append_text)
             self.log_widget.append_text("所有下载任务完成！")
             QMessageBox.information(self, "完成", "下载完成！")
         except Exception as e:
             self.log_widget.append_text(f"下载过程中出现错误：{e}")
-
+    
+    def load_character_list(self, character_file):
+        if not os.path.exists(character_file):
+            return []
+        with open(character_file, "r", encoding="utf-8") as f:
+            return [line.strip() for line in f if line.strip()]
 
     def show_about(self):
         QMessageBox.information(
             self,
             "关于",
-            "本程序用于下载原神角色语音。\n版本：v0.1\n\n"
+            "本程序用于下载原神,崩铁角色语音。\n版本：v0.2\n\n"
             "免责声明：\n"
             "本程序仅用于学习和交流目的，所有语音及文字内容的版权归原始版权所有者所有。\n"
             "请勿将本程序用于任何商业用途或违法行为。\n"

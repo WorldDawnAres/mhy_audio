@@ -6,7 +6,7 @@ def get_base_path():
         return os.path.dirname(sys.executable)
     return os.path.dirname(os.path.abspath(__file__))
 
-download_directory = os.path.join(get_base_path(), "yuan_audio_ko")
+download_directory = os.path.join(get_base_path(), "bentie_audio_ko")
 os.makedirs(download_directory, exist_ok=True)
 
 def clean_filename(filename):
@@ -35,7 +35,7 @@ async def download_audio(session, audio_url, audio_file_name, retries=3,log_func
                 print(f"放弃下载: {audio_file_name}")
 
 async def fetch_character_data(session, character_name,log_func=None):
-    new_url = f"https://genshin-impact.fandom.com/wiki/{character_name}/Voice-Overs/Korean"
+    new_url = f"https://honkai-star-rail.fandom.com/wiki/{character_name}/Voice-Overs/Korean"
     character_folder = os.path.join(download_directory, character_name)
     os.makedirs(character_folder, exist_ok=True)
 
@@ -60,7 +60,7 @@ async def fetch_character_data(session, character_name,log_func=None):
     for row in rows:
         td = row.find("td")
         if td:
-            audio_btn = td.find("span", class_="audio-button custom-theme focusable")
+            audio_btn = td.find("span", class_="audio-button custom-theme hidden")
             zh_text = td.find("span", lang="ko")
             div = row.find("div")
 

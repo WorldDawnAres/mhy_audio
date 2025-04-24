@@ -32,8 +32,7 @@
 - [x] 日志显示功能
 - [ ] 文本文件合并
 - [ ] 自定义采样率转换wav文件
-- [ ] 支持自定义选择崩铁角色
-- [ ] 支持自定义选择崩坏角色
+- [x] 支持自定义选择崩铁角色
 - [ ] 支持深色模式
 
 ## 程序结构
@@ -62,11 +61,6 @@ mhy_music
 │   │   ├── bentie_audio_download_jp.py
 │   │   ├── bentie_audio_download_zh.py
 │   │   └── bentie_audio_download_ko.py
-│   ├── /benhuai
-│   │   ├── benhuai_audio_download_en.py
-│   │   ├── benhuai_audio_download_jp.py
-│   │   ├── benhuai_audio_download_zh.py
-│   │   └── benhuai_audio_download_ko.py
 │   ├── main.py
 │   ├── audio_swapHZ.py
 │   ├── text_change.py
@@ -77,7 +71,7 @@ mhy_music
 
 >本程序用于下载和转换音频，并合并文本，以便于为AI模型训练提供MHY游戏角色的语音数据。
 >
->用户可以选择自定义选择原神角色，崩铁角色，崩坏角色，支持选择中文，英文，日文，韩文
+>用户可以选择自定义选择原神角色，崩铁角色，支持选择中文，英文，日文，韩文
 >
 >在下载后，将音频文件自定义转换为wav格式，合并文字文件
 
