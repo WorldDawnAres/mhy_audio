@@ -1,4 +1,4 @@
-import os,subprocess,threading,platform
+import os,sys,subprocess,threading,platform
 from concurrent.futures import ThreadPoolExecutor
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Signal, QObject
 from tools.config import FFMPEG_PATH, get_resource_path
+from tools.log_stream import EmittingStream
 
 class Logger(QObject):
     log_signal = Signal(str)
@@ -53,8 +54,9 @@ class AudioConverter(QWidget):
 
         self.setLayout(layout)
         self.input_folder = os.path.join(os.getcwd(), "audio")
-        self.logger = Logger()
-        self.logger.log_signal.connect(self.log_output.append)
+        
+        sys.stdout = EmittingStream(text_edit=self.log_output)
+        sys.stderr = EmittingStream(text_edit=self.log_output)
 
     def select_input_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "选择输入文件夹", os.getcwd())
@@ -65,7 +67,7 @@ class AudioConverter(QWidget):
     def start_conversion(self):
         sample_rate_text = self.sample_rate_input.text().strip()
         if not sample_rate_text.isdigit():
-            self.logger.log_signal.emit("采样率格式错误，请输入数字。")
+            print("采样率格式错误，请输入数字。")
             return
 
         sample_rate = int(sample_rate_text)
@@ -73,7 +75,7 @@ class AudioConverter(QWidget):
         output_folder = os.path.join(os.getcwd(), f"output/{sample_rate}")
         ffmpeg_path = FFMPEG_PATH
 
-        self.logger.log_signal.emit(f"开始转换，采样率：{sample_rate}，线程数：{max_workers}")
+        print(f"开始转换，采样率：{sample_rate}，线程数：{max_workers}")
         threading.Thread(
             target=self.convert_ogg_to_wav,
             args=(self.input_folder, output_folder, ffmpeg_path, sample_rate, max_workers),
@@ -97,10 +99,10 @@ class AudioConverter(QWidget):
                     check=True,
                     creationflags=flags
                 )
-                self.logger.log_signal.emit(f"转换成功: {output_path}")
+                print(f"转换成功: {output_path}")
             except subprocess.CalledProcessError:
                 failed_files.append(input_path)
-                self.logger.log_signal.emit(f"转换失败: {input_path}")
+                print(f"转换失败: {input_path}")
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = []
@@ -120,9 +122,9 @@ class AudioConverter(QWidget):
             with open(fail_path, 'w', encoding='utf-8') as f:
                 for file in failed_files:
                     f.write(f"{file}\n")
-            self.logger.log_signal.emit("部分文件转换失败，详情见 failed_files.txt")
+            print("部分文件转换失败，详情见 failed_files.txt")
 
-        self.logger.log_signal.emit("所有转换任务完成！")
+        print("所有转换任务完成！")
 
 if __name__ == "__main__":
     app = QApplication([])

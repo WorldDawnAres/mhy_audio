@@ -1,11 +1,11 @@
-import os,re
+import os,re,sys
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QTextEdit
 )
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Signal, QObject
 from tools.config import get_resource_path
-
+from tools.log_stream import EmittingStream
 
 class Logger(QObject):
     log_signal = Signal(str)
@@ -49,8 +49,11 @@ class TextMerger(QWidget):
 
         self.setLayout(layout)
 
+        sys.stdout = EmittingStream(text_edit=self.log_output)
+        sys.stderr = EmittingStream(text_edit=self.log_output)
+        
     def select_folder(self):
-        folder = QFileDialog.getExistingDirectory(self, "选择父文件夹", os.getcwd())
+        folder = QFileDialog.getExistingDirectory(self, "选择合并文件夹", os.getcwd())
         if folder:
             self.parent_folder = folder
             self.folder_label.setText(f"输入文件夹: {folder}")
@@ -82,9 +85,7 @@ class TextMerger(QWidget):
                     continue
 
                 character_name = character_folder.name
-                txt_files = sorted([
-                    f for f in os.listdir(character_folder.path) if f.endswith('.txt')
-                ])
+                txt_files = sorted([f for f in os.listdir(character_folder.path) if f.endswith('.txt')])
                 output_file = os.path.join(group_output_folder, character_name + '.txt')
 
                 with open(output_file, 'w', encoding='utf-8') as outfile:
@@ -97,11 +98,10 @@ class TextMerger(QWidget):
                                 audio_path = f"Data/yuan/audio/{character_name}/{txt_file.replace('.txt', '.wav')}"
                                 outfile.write(f"{audio_path}|{character_name}|zh|{cleaned}\n")
                         except Exception as e:
-                            self.logger.log_signal.emit(f"读取失败: {file_path} 错误: {e}")
+                            print(f"读取失败: {file_path} 错误: {e}")
+                print(f"{group_name}/{character_name} 合并完成 -> {output_file}")
 
-                self.logger.log_signal.emit(f"{group_name}/{character_name} 合并完成 -> {output_file}")
-
-        self.logger.log_signal.emit("所有子文件夹的合并任务完成！")
+        print("所有子文件夹的合并任务完成！")
 
     def log(self, text):
         self.log_output.append(text)

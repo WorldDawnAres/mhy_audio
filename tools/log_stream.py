@@ -15,9 +15,9 @@ class EmittingStream(QObject):
         if not text:
             return
         
-        if "下载完成" in text:
+        if "下载完成" in text or "转换成功" in text or "合并完成" in text:
             style = "success"
-        elif "失败" in text or "放弃" in text:
+        elif "失败" in text or "放弃" in text or "错误" in text or "转换失败" in text:
             style = "error"
         else:
             style = "info"
@@ -26,7 +26,7 @@ class EmittingStream(QObject):
 
     def write_to_output(self, text, style):
         color = {
-            "info": "black",
+            "info": "orange",
             "error": "red",
             "success": "green",
         }.get(style, "black")

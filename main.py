@@ -1,9 +1,9 @@
 import sys, os, asyncio
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QMessageBox,
-    QWidget, QVBoxLayout
+    QWidget, QVBoxLayout,QStyleFactory
 )
-from PySide6.QtGui import QAction, QIcon
+from PySide6.QtGui import QAction, QIcon,QPalette, QColor
 from qasync import QEventLoop, asyncSlot
 from functools import partial
 from PySide6.QtCore import Qt
@@ -19,6 +19,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("语音下载器")
         self.resize(700, 500)
+        self.set_dark_mode()
 
         self.setWindowIcon(QIcon(get_resource_path("icon/icon.ico")))
 
@@ -83,6 +84,16 @@ class MainWindow(QMainWindow):
         merge_text_action.triggered.connect(self.open_text_merger)
         tool_menu.addAction(merge_text_action)
 
+        theme_menu = menubar.addMenu("主题")
+
+        light_action = QAction("浅色模式", self)
+        light_action.triggered.connect(self.set_light_mode)
+        theme_menu.addAction(light_action)
+
+        dark_action = QAction("深色模式", self)
+        dark_action.triggered.connect(self.set_dark_mode)
+        theme_menu.addAction(dark_action)
+
         about_action = QAction("关于", self)
         about_action.triggered.connect(self.show_about)
         menubar.addAction(about_action)
@@ -91,6 +102,45 @@ class MainWindow(QMainWindow):
         self.audio_converter_window = AudioConverter()
         self.audio_converter_window.setWindowModality(Qt.ApplicationModal)
         self.audio_converter_window.show()
+    
+    def set_dark_mode(self):
+        dark_palette = QPalette()
+        dark_palette.setColor(QPalette.Window, QColor(53, 53, 53))
+        dark_palette.setColor(QPalette.WindowText, QColor(255, 255, 255))
+        dark_palette.setColor(QPalette.Base, QColor(35, 35, 35))
+        dark_palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
+        dark_palette.setColor(QPalette.ToolTipBase, QColor(255, 255, 255))
+        dark_palette.setColor(QPalette.ToolTipText, QColor(255, 255, 255))
+        dark_palette.setColor(QPalette.Text, QColor(255, 255, 255))
+        dark_palette.setColor(QPalette.Button, QColor(53, 53, 53))
+        dark_palette.setColor(QPalette.ButtonText, QColor(255, 255, 255))
+        dark_palette.setColor(QPalette.BrightText, QColor(255, 0, 0))
+        dark_palette.setColor(QPalette.Link, QColor(42, 130, 218))
+        dark_palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+        dark_palette.setColor(QPalette.HighlightedText, QColor(0, 0, 0))
+
+        QApplication.instance().setPalette(dark_palette)
+        QApplication.instance().setStyle(QStyleFactory.create("Fusion"))
+
+    def set_light_mode(self):
+        light_palette = QPalette()
+        light_palette.setColor(QPalette.Window, QColor(240, 240, 240))
+        light_palette.setColor(QPalette.WindowText, QColor(0, 0, 0))
+        light_palette.setColor(QPalette.Base, QColor(255, 255, 255))
+        light_palette.setColor(QPalette.AlternateBase, QColor(240, 240, 240))
+        light_palette.setColor(QPalette.ToolTipBase, QColor(0, 0, 0))
+        light_palette.setColor(QPalette.ToolTipText, QColor(0, 0, 0))
+        light_palette.setColor(QPalette.Text, QColor(0, 0, 0))
+        light_palette.setColor(QPalette.Button, QColor(240, 240, 240))
+        light_palette.setColor(QPalette.ButtonText, QColor(0, 0, 0))
+        light_palette.setColor(QPalette.BrightText, QColor(255, 0, 0))
+        light_palette.setColor(QPalette.Link, QColor(42, 130, 218))
+        light_palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+        light_palette.setColor(QPalette.HighlightedText, QColor(255, 255, 255))
+
+        app = QApplication.instance()
+        app.setPalette(light_palette)
+        app.setStyle(QStyleFactory.create("Fusion"))
     
     def open_text_merger(self):
         self.text_merger_window = TextMerger()
@@ -179,7 +229,7 @@ class MainWindow(QMainWindow):
         QMessageBox.information(
             self,
             "关于",
-            "本程序用于下载原神,崩铁角色语音。\n版本：v0.4\n\n"
+            "本程序用于下载原神,崩铁角色语音。\n版本：v0.5\n\n"
             "免责声明：\n"
             "本程序仅用于学习和交流目的，所有语音及文字内容的版权归原始版权所有者所有。\n"
             "请勿将本程序用于任何商业用途或违法行为。\n"
