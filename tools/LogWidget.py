@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtWidgets import QTextEdit
 from PySide6.QtGui import QTextCursor
-from tool.log_stream import EmittingStream
+from tools.log_stream import EmittingStream
 
 class LogWidget(QTextEdit):
     def __init__(self, parent=None):

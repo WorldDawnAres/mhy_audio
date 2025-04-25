@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
     QGridLayout, QWidget, QScrollArea, QHBoxLayout, QLineEdit, QLabel
 )
 import os
-from tool.config import CHARACTER_FILE_YUAN, CHARACTER_FILE_BENTIE
+from tools.config import CHARACTER_FILE_YUAN, CHARACTER_FILE_BENTIE
 
 class CharacterSelector(QDialog):
     def __init__(self, selected_callback,game_name,parent=None):

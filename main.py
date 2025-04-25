@@ -6,10 +6,12 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QAction, QIcon
 from qasync import QEventLoop, asyncSlot
 from functools import partial
+from PySide6.QtCore import Qt
 
-from tool.character_selector import CharacterSelector
-from tool.config import get_resource_path,CHARACTER_FILE_YUAN,CHARACTER_FILE_BENTIE
-from tool.LogWidget import LogWidget
+from tools.character_selector import CharacterSelector
+from tools.audio_converter import AudioConverter
+from tools.config import get_resource_path,CHARACTER_FILE_YUAN,CHARACTER_FILE_BENTIE
+from tools.LogWidget import LogWidget
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -34,7 +36,6 @@ class MainWindow(QMainWindow):
 
     def init_menu(self):
         menubar = self.menuBar()
-
         def on_game_selected(game_key):
             self.open_character_selector(game_key)
 
@@ -71,9 +72,20 @@ class MainWindow(QMainWindow):
         ko_action.triggered.connect(lambda: self.download_selected_characters("ko"))
         download_menu.addAction(ko_action)
 
+        tool_menu = menubar.addMenu("工具")
+        
+        convert_audio_action = QAction("音频转换", self)
+        convert_audio_action.triggered.connect(self.open_audio_converter)
+        tool_menu.addAction(convert_audio_action)
+
         about_action = QAction("关于", self)
         about_action.triggered.connect(self.show_about)
         menubar.addAction(about_action)
+    
+    def open_audio_converter(self):
+        self.audio_converter_window = AudioConverter()
+        self.audio_converter_window.setWindowModality(Qt.ApplicationModal)
+        self.audio_converter_window.show()
 
     def open_character_selector(self, game_name):
         self.selected_game = game_name
@@ -158,7 +170,7 @@ class MainWindow(QMainWindow):
         QMessageBox.information(
             self,
             "关于",
-            "本程序用于下载原神,崩铁角色语音。\n版本：v0.2\n\n"
+            "本程序用于下载原神,崩铁角色语音。\n版本：v0.3\n\n"
             "免责声明：\n"
             "本程序仅用于学习和交流目的，所有语音及文字内容的版权归原始版权所有者所有。\n"
             "请勿将本程序用于任何商业用途或违法行为。\n"

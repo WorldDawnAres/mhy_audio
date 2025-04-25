@@ -6,7 +6,7 @@ def get_base_path():
         return os.path.dirname(sys.executable)
     return os.path.dirname(os.path.abspath(__file__))
 
-download_directory = os.path.join(get_base_path(), "bentie_audio_jp")
+download_directory = os.path.join(get_base_path(), "audio/bentie_audio_jp")
 os.makedirs(download_directory, exist_ok=True)
 
 def clean_filename(filename):

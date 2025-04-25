@@ -31,7 +31,7 @@
 - [x] 支持Windows和Linux
 - [x] 日志显示功能
 - [ ] 文本文件合并
-- [ ] 自定义采样率转换wav文件
+- [x] 自定义采样率转换wav文件
 - [x] 支持自定义选择崩铁角色
 - [ ] 支持深色模式
 
@@ -43,11 +43,11 @@ mhy_music
 │   ├── /icon
 │   │   └── icon.ico
 │   ├── /txt
-│   │   ├── characters_benhuai.txt
 │   │   ├── characters_bentie.txt
 │   │   └── characters_yuan.txt
-│   ├── /tool
+│   ├── /tools
 │   │   ├── character_selector.py
+│   │   ├── audio_converter.py
 │   │   ├── config.py
 │   │   ├── log_stream.py
 │   │   └── LogWidget.py
@@ -62,8 +62,6 @@ mhy_music
 │   │   ├── bentie_audio_download_zh.py
 │   │   └── bentie_audio_download_ko.py
 │   ├── main.py
-│   ├── audio_swapHZ.py
-│   ├── text_change.py
 └── /README.md
 ```
 
