@@ -12,6 +12,7 @@ from tools.character_selector import CharacterSelector
 from tools.audio_converter import AudioConverter
 from tools.config import get_resource_path,CHARACTER_FILE_YUAN,CHARACTER_FILE_BENTIE
 from tools.LogWidget import LogWidget
+from tools.text_merger import TextMerger
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -78,6 +79,10 @@ class MainWindow(QMainWindow):
         convert_audio_action.triggered.connect(self.open_audio_converter)
         tool_menu.addAction(convert_audio_action)
 
+        merge_text_action = QAction("合并文本", self)
+        merge_text_action.triggered.connect(self.open_text_merger)
+        tool_menu.addAction(merge_text_action)
+
         about_action = QAction("关于", self)
         about_action.triggered.connect(self.show_about)
         menubar.addAction(about_action)
@@ -86,6 +91,10 @@ class MainWindow(QMainWindow):
         self.audio_converter_window = AudioConverter()
         self.audio_converter_window.setWindowModality(Qt.ApplicationModal)
         self.audio_converter_window.show()
+    
+    def open_text_merger(self):
+        self.text_merger_window = TextMerger()
+        self.text_merger_window.show()
 
     def open_character_selector(self, game_name):
         self.selected_game = game_name
@@ -170,7 +179,7 @@ class MainWindow(QMainWindow):
         QMessageBox.information(
             self,
             "关于",
-            "本程序用于下载原神,崩铁角色语音。\n版本：v0.3\n\n"
+            "本程序用于下载原神,崩铁角色语音。\n版本：v0.4\n\n"
             "免责声明：\n"
             "本程序仅用于学习和交流目的，所有语音及文字内容的版权归原始版权所有者所有。\n"
             "请勿将本程序用于任何商业用途或违法行为。\n"

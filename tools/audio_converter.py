@@ -23,7 +23,7 @@ class AudioConverter(QWidget):
         self.input_label = QLabel("输入文件夹: (默认 ./audio)")
         layout.addWidget(self.input_label)
 
-        folder_btn = QPushButton("选择输入文件夹")
+        folder_btn = QPushButton("选择转换文件夹")
         folder_btn.clicked.connect(self.select_input_folder)
         layout.addWidget(folder_btn)
 

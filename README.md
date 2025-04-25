@@ -30,7 +30,7 @@
 - [x] 可选择中文，英文，日文，韩文
 - [x] 支持Windows和Linux
 - [x] 日志显示功能
-- [ ] 文本文件合并
+- [x] 文本文件合并
 - [x] 自定义采样率转换wav文件
 - [x] 支持自定义选择崩铁角色
 - [ ] 支持深色模式
@@ -43,12 +43,14 @@ mhy_music
 │   ├── /icon
 │   │   ├── icon.ico
 │   │   ├── icon1.ico
-│   │   └── icon2.ico
+│   │   ├── icon2.ico
+│   │   └── icon3.ico
 │   ├── /txt
 │   │   ├── characters_bentie.txt
 │   │   └── characters_yuan.txt
 │   ├── /tools
 │   │   ├── character_selector.py
+│   │   ├── text_merger.py
 │   │   ├── audio_converter.py
 │   │   ├── config.py
 │   │   ├── log_stream.py
@@ -89,9 +91,11 @@ mhy_music
 
 ![Screenshot 1](./Pictures/3.png "可选标题")
 
+![Screenshot 1](./Pictures/4.png "可选标题")
+
 >
 
-![Screenshot 1](./Pictures/4.png "可选标题")
+![Screenshot 1](./Pictures/5.png "可选标题")
 
 ## 安装和运行方式
 
