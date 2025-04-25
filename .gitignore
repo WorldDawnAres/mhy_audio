@@ -27,6 +27,7 @@ tcl/
 DLLs/
 Lib/
 Include/
+tool/
 *.egg-info/
 .installed.cfg
 *.egg

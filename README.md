@@ -41,7 +41,9 @@
 mhy_music
 ├── /mhy_music
 │   ├── /icon
-│   │   └── icon.ico
+│   │   ├── icon.ico
+│   │   ├── icon1.ico
+│   │   └── icon2.ico
 │   ├── /txt
 │   │   ├── characters_bentie.txt
 │   │   └── characters_yuan.txt
@@ -51,6 +53,8 @@ mhy_music
 │   │   ├── config.py
 │   │   ├── log_stream.py
 │   │   └── LogWidget.py
+│   ├── /tool
+│   │   ├── ffmpeg.exe
 │   ├── /yuan
 │   │   ├── yuan_audio_download_en.py
 │   │   ├── yuan_audio_download_jp.py
@@ -83,9 +87,11 @@ mhy_music
 
 ![Screenshot 1](./Pictures/2.png "可选标题")
 
+![Screenshot 1](./Pictures/3.png "可选标题")
+
 >
 
-![Screenshot 1](./Pictures/3.png "可选标题")
+![Screenshot 1](./Pictures/4.png "可选标题")
 
 ## 安装和运行方式
 
@@ -105,16 +111,24 @@ pip install PyInstaller(可选)
 #### 方法一
 
 >使用 PyInstaller 打包程序：
+>
+>1.你需要在ffmpeg官网下载ffmpeg，并放在/mhy_music/tool/目录下
+
+[点击此处下载ffmpeg](https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0.2-full_build.7z)
+>2.在上面链接下载后将压缩包解压并找到bin里的ffmpeg.exe解压到/mhy_music/tool/目录下(若没有创建文件夹则自行创建)
+>
+>3.然后使用以下命令打包程序：
 
 ```bash
-PyInstaller -F --add-data "icon/*;icon" --add-data "txt/*;txt" -i icon/icon.jpg main.py
+PyInstaller -F --add-data "./txt/*;txt" --add-data "./icon/*;icon" --add-data "./tool/*;tool" -w -i ./icon/icon.ico main.py
 ```
 
->然后在 dist 目录下找到可执行文件。
+>最后在 dist 目录下找到可执行文件。
 
 #### 方法二
 
 >直接运行 Python 脚本：
+>需要安装相应库然后完成下载ffmpeg步骤后直接运行main.py即可
 
 ```bash
 python main.py
