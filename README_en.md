@@ -116,10 +116,10 @@ pip install PyInstaller(optional)
 
 >Using PyInstaller to package programs:
 >
->1.You need to download ffmpeg from the official ffmpeg website and place it in the/myy_music/tool/directory
+>1. You need to download ffmpeg from the ffmpeg official website (the following methods apply to Windows)
 
 [click here to download ffmpeg](https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0.2-full_build.7z)
->2.After downloading from the link above, unzip the compressed file and find ffmpeg.exe in the bin to the/myy_music/tool/directory (if no folder is created, create it yourself)
+>2.After downloading from the link above, unzip the compressed file and find ffmpeg.exe in the bin to the/myy_music/tool/ directory (if no folder is created, create it yourself)
 >
 >3.Then use the following command to package the program:
 
@@ -128,12 +128,20 @@ PyInstaller -F --add-data "./txt/*;txt" --add-data "./icon/*;icon" --add-data ".
 ```
 
 >Finally, locate the executable file in the dist directory.
+>
+>The following methods are applicable to Linux
+>
+>If Linux needs to package ffmpeg, it is necessary to pack all the decompressed binary files in the/myy_music/tool/ directory
+
+[Click here to view the download for Linux-ffmpeg方法](https://blog.csdn.net/weixin_43667077/article/details/122276284)
 
 #### Method 2
 
 >Directly run Python script:
 >
->You need to install the corresponding library, complete the steps to download ffmpeg, and then run main.exe directly
+>You need to install the corresponding library, complete the steps to download ffmpeg, and then run main.exe directly(apply to windows)
+>
+>On Linux, you can install ffmpeg using the command and run main.exe
 
 ```bash
 python main.py

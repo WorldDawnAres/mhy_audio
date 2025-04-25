@@ -116,10 +116,10 @@ pip install PyInstaller(可选)
 
 >使用 PyInstaller 打包程序：
 >
->1.你需要在ffmpeg官网下载ffmpeg，并放在/mhy_music/tool/目录下
+>1.你需要在ffmpeg官网下载ffmpeg(以下方法适用于windows)
 
 [点击此处下载ffmpeg](https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0.2-full_build.7z)
->2.在上面链接下载后将压缩包解压并找到bin里的ffmpeg.exe解压到/mhy_music/tool/目录下(若没有创建文件夹则自行创建)
+>2.在上面链接下载后将压缩包解压并找到bin里的ffmpeg.exe解压到/mhy_music/tool/ 目录下(若没有创建文件夹则自行创建)
 >
 >3.然后使用以下命令打包程序：
 
@@ -128,12 +128,20 @@ PyInstaller -F --add-data "./txt/*;txt" --add-data "./icon/*;icon" --add-data ".
 ```
 
 >最后在 dist 目录下找到可执行文件。
+>
+>以下方法适用于Linux
+>
+>Linux如果需要打包ffmpeg则需要将解压的二进制文件全部放在/mhy_music/tool/ 目录下打包
+
+[点击此处查看下载适用于Linux-ffmpeg方法](https://blog.csdn.net/weixin_43667077/article/details/122276284)
 
 #### 方法二
 
 >直接运行 Python 脚本：
 >
->需要安装相应库然后完成下载ffmpeg步骤后直接运行main.py即可
+>需要安装相应库然后完成下载ffmpeg步骤后直接运行main.py即可(适用于windows)
+>
+>在Linux上可以通过命令安装ffmpeg后运行main.py
 
 ```bash
 python main.py
