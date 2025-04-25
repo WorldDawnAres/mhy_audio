@@ -128,6 +128,7 @@ PyInstaller -F --add-data "./txt/*;txt" --add-data "./icon/*;icon" --add-data ".
 #### 方法二
 
 >直接运行 Python 脚本：
+>
 >需要安装相应库然后完成下载ffmpeg步骤后直接运行main.py即可
 
 ```bash

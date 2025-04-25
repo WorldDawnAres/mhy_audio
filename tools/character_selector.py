@@ -100,7 +100,11 @@ class CharacterSelector(QDialog):
             cb.setChecked(False)
 
     def save_and_close(self):
-        selected = [eng for eng, cb in self.checkboxes.items() if cb.isChecked()]
+        selected = [
+            f"{eng}|{self.all_characters[eng]}"
+            for eng, cb in self.checkboxes.items()
+            if cb.isChecked()
+        ]
         if self.selected_callback:
             self.selected_callback(selected)
         self.accept()

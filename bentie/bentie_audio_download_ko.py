@@ -35,8 +35,12 @@ async def download_audio(session, audio_url, audio_file_name, retries=3,log_func
                 print(f"放弃下载: {audio_file_name}")
 
 async def fetch_character_data(session, character_name,log_func=None):
-    new_url = f"https://honkai-star-rail.fandom.com/wiki/{character_name}/Voice-Overs/Korean"
-    character_folder = os.path.join(download_directory, character_name)
+    if '|' in character_name:
+        english_name, folder_name = character_name.split('|', 1)
+    else:
+        english_name = folder_name = character_name
+    new_url = f"https://honkai-star-rail.fandom.com/wiki/{english_name}/Voice-Overs/Korean"
+    character_folder = os.path.join(download_directory, folder_name)
     os.makedirs(character_folder, exist_ok=True)
 
     for attempt in range(3):
