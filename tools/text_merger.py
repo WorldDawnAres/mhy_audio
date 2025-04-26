@@ -77,6 +77,13 @@ class TextMerger(QWidget):
                 continue
 
             group_name = group_folder.name
+            prefix_match = re.match(r'^([a-zA-Z0-9]+)_audio_([a-zA-Z\-]+)$', group_name)
+            if not prefix_match:
+                print(f"文件夹名不符合格式，跳过: {group_name}")
+                continue
+            model_name = prefix_match.group(1)
+            language = prefix_match.group(2)
+
             group_output_folder = os.path.join(self.output_folder, group_name)
             os.makedirs(group_output_folder, exist_ok=True)
 
@@ -95,8 +102,8 @@ class TextMerger(QWidget):
                             with open(file_path, 'r', encoding='utf-8') as infile:
                                 content = infile.read()
                                 cleaned = self.clean_content(content)
-                                audio_path = f"Data/yuan/audio/{character_name}/{txt_file.replace('.txt', '.wav')}"
-                                outfile.write(f"{audio_path}|{character_name}|zh|{cleaned}\n")
+                                audio_path = f"Data/{model_name}/audio/{model_name}_audio_{language}/{character_name}/{txt_file.replace('.txt', '.wav')}"
+                                outfile.write(f"{audio_path}|{character_name}|{language}|{cleaned}\n")
                         except Exception as e:
                             print(f"读取失败: {file_path} 错误: {e}")
                 print(f"{group_name}/{character_name} 合并完成 -> {output_file}")
