@@ -23,7 +23,7 @@ Bronya|布洛妮娅
 Clara|克拉拉
 Gepard|杰帕德
 Seele|希儿
-Guinaifen|
+Guinaifen|桂乃芬
 Hanya|寒鸦
 Moze|莫泽
 Qingque|青雀
@@ -49,7 +49,7 @@ Misha|米沙
 Robin|知更鸟
 Aventurine|砂金
 Jade|翡翠
-Topaz_%26_Numby|托帕&账账
+Topaz_and_Numby|托帕&账账
 Acheron|黄泉
 Argenti|银枝
 Black_Swan|黑天鹅

@@ -54,6 +54,7 @@ mhy_music
 │   │   ├── audio_converter.py
 │   │   ├── config.py
 │   │   ├── log_stream.py
+│   │   ├── ui.py
 │   │   └── LogWidget.py
 │   ├── /tool
 │   │   ├── ffmpeg.exe
