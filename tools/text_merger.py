@@ -1,6 +1,6 @@
 import os,re,sys
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QTextEdit
+    QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QTextEdit,QInputDialog
 )
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Signal, QObject
@@ -23,6 +23,8 @@ class TextMerger(QWidget):
         self.parent_folder = os.path.join(os.getcwd(), "audio")
         self.output_folder = os.path.join(os.getcwd(), "output/text")
 
+        self.text = None
+
         layout = QVBoxLayout()
 
         self.folder_label = QLabel("输入文件夹: (默认 ./audio)")
@@ -38,6 +40,13 @@ class TextMerger(QWidget):
         output_btn = QPushButton("选择输出文件夹")
         output_btn.clicked.connect(self.select_output_folder)
         layout.addWidget(output_btn)
+
+        self.custom_label = QLabel("请点击按钮输入可选信息：(不输入则使用默认格式)")
+        layout.addWidget(self.custom_label)
+
+        custom_btn = QPushButton("自定义文本内容")
+        custom_btn.clicked.connect(self.custom_text)
+        layout.addWidget(custom_btn)
 
         merge_btn = QPushButton("开始合并")
         merge_btn.clicked.connect(self.merge)
@@ -67,6 +76,23 @@ class TextMerger(QWidget):
     def clean_content(self, content):
         content = re.sub(r'[「」]', '', content)
         return content.replace('\n', ' ').replace('\r', ' ')
+    
+    def custom_text(self):
+        default_text = "Data/{model_name}/audio/{model_name}_audio_{language}/{character_name}"
+        text, ok = QInputDialog.getText(self, "自定义文本", 
+                                        "请输入自定义文本路径:\n可输入内容有:\n1. {model_name}: 模型名称\n"
+                                        "2. {language}: 语言\n3. {character_name}: 角色名称\n"
+                                        "4. 其他文件夹名称: 如Data等\n5. 可根据以下示例格式自定义输入",
+                                        text=default_text)
+        if ok:
+            self.text = text.strip() if text.strip() else default_text
+        else:
+            self.text = None
+    
+        if self.text:
+            self.custom_label.setText(f"当前自定义内容: {self.text}")
+        else:
+            self.custom_label.setText("使用默认格式")
 
     def merge(self):
         if not os.path.exists(self.output_folder):
@@ -102,7 +128,15 @@ class TextMerger(QWidget):
                             with open(file_path, 'r', encoding='utf-8') as infile:
                                 content = infile.read()
                                 cleaned = self.clean_content(content)
-                                audio_path = f"Data/{model_name}/audio/{model_name}_audio_{language}/{character_name}/{txt_file.replace('.txt', '.wav')}"
+                                if self.text:
+                                    real_path = self.text.format(
+                                        model_name=model_name,
+                                        language=language,
+                                        character_name=character_name
+                                    )
+                                    audio_path = os.path.join(real_path, txt_file.replace(".txt", ".wav")).replace("\\", "/")
+                                else:
+                                    audio_path = txt_file.replace(".txt", ".wav")
                                 outfile.write(f"{audio_path}|{character_name}|{language}|{cleaned}\n")
                         except Exception as e:
                             print(f"读取失败: {file_path} 错误: {e}")
