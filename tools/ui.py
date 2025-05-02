@@ -1,10 +1,10 @@
-import sys, os, asyncio,aiohttp
+import os, asyncio,aiohttp
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QMessageBox,
     QWidget, QVBoxLayout,QStyleFactory
 )
 from PySide6.QtGui import QAction, QIcon,QPalette, QColor
-from qasync import QEventLoop, asyncSlot
+from qasync import asyncSlot
 from functools import partial
 from PySide6.QtCore import Qt
 from asyncio import Semaphore
@@ -177,7 +177,7 @@ class MainWindow(QMainWindow):
             else:
                 return
 
-        self.log_widget.append_text(f"开始下载语音文件（游戏：{self.selected_game}，语言：{language}）...")
+        print(f"开始下载语音文件（游戏：{self.selected_game}，语言：{language}）...")
 
         if not self.selected_game:
             self.log_widget.append_text("请先选择游戏！")
@@ -210,7 +210,7 @@ class MainWindow(QMainWindow):
                 raise ImportError("未知游戏标记")
 
         except ImportError as e:
-            self.log_widget.append_text(f"导入下载模块失败：{e}")
+            print(f"导入下载模块失败：{e}")
             return
         
         semaphore = Semaphore(5)
@@ -218,15 +218,15 @@ class MainWindow(QMainWindow):
         async def limited_download(character):
             async with semaphore:
                 async with aiohttp.ClientSession() as session:
-                    await download_module.fetch_character_data(session,character, log_func=self.log_widget.append_text)
+                    await download_module.fetch_character_data(session,character)
 
         try:
             tasks = [limited_download(character) for character in self.selected_characters]
             await asyncio.gather(*tasks)
-            self.log_widget.append_text("所有下载任务完成！")
+            print("所有下载任务完成！")
             QMessageBox.information(self, "完成", "下载完成！")
         except Exception as e:
-            self.log_widget.append_text(f"下载过程中出现错误：{e}")
+            print(f"下载过程中出现错误：{e}")
     
     def load_character_list(self, character_file):
         if not os.path.exists(character_file):

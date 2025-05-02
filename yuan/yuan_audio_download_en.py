@@ -12,29 +12,23 @@ os.makedirs(download_directory, exist_ok=True)
 def clean_filename(filename):
     return re.sub(r'[\\/*?:"<>|]', "_", filename)
 
-async def download_audio(session, audio_url, audio_file_name, retries=3,log_func=None):
+async def download_audio(session, audio_url, audio_file_name, retries=3):
     for attempt in range(retries):
         try:
             async with session.get(audio_url, timeout=aiohttp.ClientTimeout(total=60)) as response:
                 response.raise_for_status()
                 with open(audio_file_name, 'wb') as file:
                     file.write(await response.read())
-                if log_func:
-                    log_func(f"下载完成: {audio_file_name}")
                 print(f"下载完成: {audio_file_name}")
                 return
         except aiohttp.ClientError as e:
-            if log_func:
-                log_func(f"下载失败: {audio_file_name} - {e}")
             print(f"下载失败: {audio_file_name} - {e}")
             if attempt < retries - 1:
                 await asyncio.sleep(2 ** attempt)
             else:
-                if log_func:
-                    log_func(f"放弃下载: {audio_file_name}")
                 print(f"放弃下载: {audio_file_name}")
 
-async def fetch_character_data(session, character_name,log_func=None):
+async def fetch_character_data(session, character_name):
     if '|' in character_name:
         english_name, folder_name = character_name.split('|', 1)
     else:
@@ -53,8 +47,6 @@ async def fetch_character_data(session, character_name,log_func=None):
             if attempt < 2:
                 await asyncio.sleep(5 ** attempt)
             else:
-                if log_func:
-                    log_func(f"放弃获取页面: {character_name}")
                 print(f"放弃获取页面: {character_name}")
                 return
     if new_soup:
