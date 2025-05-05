@@ -25,3 +25,4 @@ def get_ffmpeg_path():
 CHARACTER_FILE_YUAN = get_resource_path("txt/characters_yuan.txt")
 CHARACTER_FILE_BENTIE = get_resource_path("txt/characters_bentie.txt")
 FFMPEG_PATH = get_ffmpeg_path()
+FONTS_PATH = get_resource_path("fonts/SourceHanSansTC-Light.ttf")

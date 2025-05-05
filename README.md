@@ -12,11 +12,12 @@
     - [运行程序](#运行程序)
       - [方法一](#方法一)
       - [方法二](#方法二)
+      - [方法三](#方法三)
   - [免责声明🛡️](#免责声明️)
 
 ## 下载地址
 
-[点击此处进行下载](https://github.com/WorldDawnAres/mhy_music/releases)
+[点击此处进行下载](https://github.com/WorldDawnAres/mhy_audio/releases)
 >
 > releases中.exe使用Python3.10.11版本打包，可能不支持Windows7以下系统使用
 >
@@ -38,8 +39,8 @@
 ## 程序结构
 
 ```bash
-mhy_music
-├── /mhy_music
+mhy_audio
+├── /mhy_audio
 │   ├── /icon
 │   │   ├── icon.ico
 │   │   ├── icon1.ico
@@ -48,6 +49,8 @@ mhy_music
 │   ├── /txt
 │   │   ├── characters_bentie.txt
 │   │   └── characters_yuan.txt
+│   ├── /fonts
+│   │   └── SourceHanSansTC-Light.ttf
 │   ├── /tools
 │   │   ├── character_selector.py
 │   │   ├── text_merger.py
@@ -98,6 +101,10 @@ mhy_music
 
 ![Screenshot 1](./Pictures/5.png "可选标题")
 
+>程序字体使用SourceHanSansTC-Light.ttf，用户可以根据自己的喜好选择使用其他字体打包
+>
+[使用字体原地址](https://github.com/adobe-fonts/source-han-serif)
+
 ## 安装和运行方式
 
 ### 安装python库
@@ -120,7 +127,7 @@ pip install PyInstaller(可选)
 >1.你需要在ffmpeg官网下载ffmpeg(以下方法适用于windows)
 
 [点击此处下载ffmpeg](https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0.2-full_build.7z)
->2.在上面链接下载后将压缩包解压并找到bin里的ffmpeg.exe解压到/mhy_music/tool/ 目录下(若没有创建文件夹则自行创建)
+>2.在上面链接下载后将压缩包解压并找到bin里的ffmpeg.exe解压到/mhy_audio/tool/ 目录下(若没有创建文件夹则自行创建)
 >
 >3.然后使用以下命令打包程序：
 
@@ -132,7 +139,7 @@ PyInstaller -F --add-data "./txt/*;txt" --add-data "./icon/*;icon" --add-data ".
 >
 >以下方法适用于Linux
 >
->Linux如果需要打包ffmpeg则需要将解压的二进制文件全部放在/mhy_music/tool/ 目录下打包
+>Linux如果需要打包ffmpeg则需要将解压的二进制文件全部放在/mhy_audio/tool/ 目录下打包
 
 [点击此处查看下载适用于Linux-ffmpeg方法](https://blog.csdn.net/weixin_43667077/article/details/122276284)
 
@@ -146,6 +153,21 @@ PyInstaller -F --add-data "./txt/*;txt" --add-data "./icon/*;icon" --add-data ".
 
 ```bash
 python main.py
+```
+
+#### 方法三
+
+>windows用户可以直接下载releases中的exe文件直接运行
+>
+>Linux用户下载releases中的二进制文件直接运行(带图形界面)
+>
+>在linux非图形化界面中可安装x11等图形化界面库后运行(针对SSH远程来说)
+>
+>操作方式如下：
+
+```bash
+sudo apt-get update
+sudo apt-get install libxcb-xkb1 libxkbcommon-x11-0 libgl1 libegl1
 ```
 
 ## 免责声明🛡️

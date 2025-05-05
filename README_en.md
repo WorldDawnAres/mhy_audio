@@ -12,11 +12,12 @@
     - [Run the program](#run-the-program)
       - [Method 1](#method-1)
       - [Method 2](#method-2)
+      - [Method 3](#method-3)
   - [Disclaimers 🛡️](#disclaimers-️)
 
 ## Download link
 
-[Click here to download](https://github.com/WorldDawnAres/mhy_music/releases)
+[Click here to download](https://github.com/WorldDawnAres/mhy_audio/releases)
 >
 >.exe in releases is packaged using Python version 3.10.11, which may not be supported for systems below Windows 7
 >
@@ -38,8 +39,8 @@
 ## Program Structure
 
 ```bash
-mhy_music
-├── /mhy_music
+mhy_audio
+├── /mhy_audio
 │   ├── /icon
 │   │   ├── icon.ico
 │   │   ├── icon1.ico
@@ -48,6 +49,8 @@ mhy_music
 │   ├── /txt
 │   │   ├── characters_bentie.txt
 │   │   └── characters_yuan.txt
+│   ├── /fonts
+│   │   └── SourceHanSansTC-Light.ttf
 │   ├── /tools
 │   │   ├── character_selector.py
 │   │   ├── text_merger.py
@@ -98,6 +101,9 @@ mhy_music
 
 ![Screenshot 1](./Pictures/5.png "可选标题")
 
+>The program font uses SourceHanSansTC Light.ttf, and users can choose to package with other fonts according to their preferences
+[Font using original address](https://github.com/adobe-fonts/source-han-serif)
+
 ## Installation and operation mode
 
 ### Install Python library
@@ -120,7 +126,7 @@ pip install PyInstaller(optional)
 >1. You need to download ffmpeg from the ffmpeg official website (the following methods apply to Windows)
 
 [click here to download ffmpeg](https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0.2-full_build.7z)
->2.After downloading from the link above, unzip the compressed file and find ffmpeg.exe in the bin to the/myy_music/tool/ directory (if no folder is created, create it yourself)
+>2.After downloading from the link above, unzip the compressed file and find ffmpeg.exe in the bin to the/myy_audio/tool/ directory (if no folder is created, create it yourself)
 >
 >3.Then use the following command to package the program:
 
@@ -132,7 +138,7 @@ PyInstaller -F --add-data "./txt/*;txt" --add-data "./icon/*;icon" --add-data ".
 >
 >The following methods are applicable to Linux
 >
->If Linux needs to package ffmpeg, it is necessary to pack all the decompressed binary files in the/myy_music/tool/ directory
+>If Linux needs to package ffmpeg, it is necessary to pack all the decompressed binary files in the/myy_audio/tool/ directory
 
 [Click here to view the download for Linux-ffmpeg方法](https://blog.csdn.net/weixin_43667077/article/details/122276284)
 
@@ -146,6 +152,21 @@ PyInstaller -F --add-data "./txt/*;txt" --add-data "./icon/*;icon" --add-data ".
 
 ```bash
 python main.py
+```
+
+#### Method 3
+
+>Windows users can directly download the exe file from the releases and run it directly
+>
+>Linux users download binary files from releases and run them directly (with graphical interface)
+>
+>In Linux non graphical interfaces, graphical interface libraries such as X11 can be installed and run (for SSH remote)
+>
+>The operation method is as follows:
+
+```bash
+sudo apt-get update
+sudo apt-get install libxcb-xkb1 libxkbcommon-x11-0 libgl1 libegl1
 ```
 
 ## Disclaimers 🛡️
