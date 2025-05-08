@@ -102,7 +102,10 @@ mhy_audio
 ![Screenshot 1](./Pictures/5.png "可选标题")
 
 >The program font uses SourceHanSansTC Light.ttf, and users can choose to package with other fonts according to their preferences
-[Font using original address](https://github.com/adobe-fonts/source-han-serif)
+>
+>Simply place the file in the/fonts folder and modify the font path in config.py by yourself
+>
+[Click to download this program using the original font address](https://github.com/adobe-fonts/source-han-serif)
 
 ## Installation and operation mode
 
@@ -111,7 +114,7 @@ mhy_audio
 >Use the following command to install the required Python libraries:
 
 ```bash
-pip install aiohttp beautifulsoup4 PySide6 qasync
+pip install aiohttp beautifulsoup4 PySide6 qasync requests
 pip install PyInstaller(optional)
 ```
 
@@ -166,7 +169,7 @@ python main.py
 
 ```bash
 sudo apt-get update
-sudo apt-get install libxcb-xkb1 libxkbcommon-x11-0 libgl1 libegl1
+sudo apt-get install libgl1 libegl1 libxcb-icccm4 libxcb-cursor0 libxcb-keysyms1 libxcb-shape0 libxkbcommon-x11-0
 ```
 
 ## Disclaimers 🛡️

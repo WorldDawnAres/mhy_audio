@@ -103,7 +103,9 @@ mhy_audio
 
 >程序字体使用SourceHanSansTC-Light.ttf，用户可以根据自己的喜好选择使用其他字体打包
 >
-[使用字体原地址](https://github.com/adobe-fonts/source-han-serif)
+>将文件放在/fonts文件夹下并自行修改config.py中的字体路径即可
+>
+[点击下载本程序使用字体原地址](https://github.com/adobe-fonts/source-han-serif)
 
 ## 安装和运行方式
 
@@ -112,7 +114,7 @@ mhy_audio
 >使用以下命令安装所需的Python库:
 
 ```bash
-pip install aiohttp beautifulsoup4 PySide6 qasync
+pip install aiohttp beautifulsoup4 PySide6 qasync requests
 pip install PyInstaller(可选)
 ```
 
@@ -167,7 +169,7 @@ python main.py
 
 ```bash
 sudo apt-get update
-sudo apt-get install libxcb-xkb1 libxkbcommon-x11-0 libgl1 libegl1
+sudo apt-get install libgl1 libegl1 libxcb-icccm4 libxcb-cursor0 libxcb-keysyms1 libxcb-shape0 libxkbcommon-x11-0
 ```
 
 ## 免责声明🛡️

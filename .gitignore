@@ -28,6 +28,7 @@ DLLs/
 Lib/
 Include/
 tool/
+fonts/*.ttf
 *.egg-info/
 .installed.cfg
 *.egg
