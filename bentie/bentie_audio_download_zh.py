@@ -28,12 +28,16 @@ async def download_audio(session, audio_url, audio_file_name, retries=3):
             else:
                 print(f"放弃下载: {audio_file_name}")
 
-async def fetch_character_data(session, character_name):
+async def fetch_character_data(session, character_name,urls):
     if '|' in character_name:
         english_name, folder_name = character_name.split('|', 1)
     else:
         english_name = folder_name = character_name
-    new_url = f"https://honkai-star-rail.fandom.com/wiki/{english_name}/Voice-Overs/Chinese"
+    if '|' in urls:
+        url1, url2 = urls.split('|', 1)
+    else:
+        url1 = url2 = urls
+    new_url = f"{url1}/{english_name}/Voice-Overs/Chinese"
     character_folder = os.path.join(download_directory, folder_name)
     os.makedirs(character_folder, exist_ok=True)
 
@@ -89,7 +93,7 @@ async def fetch_character_data(session, character_name):
 
     await asyncio.gather(*tasks)
 
-async def download_all(character_names: list[str], log_func:callable):
+async def download_all(character_names: list[str],url: str, log_func:callable):
     async with aiohttp.ClientSession() as session:
-        tasks = [fetch_character_data(session, name, log_func=log_func) for name in character_names]
+        tasks = [fetch_character_data(session, name,urls, log_func=log_func) for name in character_names for urls in url]
         await asyncio.gather(*tasks)

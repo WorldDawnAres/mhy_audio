@@ -94,55 +94,114 @@ class TextMerger(QWidget):
         else:
             self.custom_label.setText("使用默认格式")
 
+    def get_language_from_path(self, folder_path):
+        current_folder = os.path.basename(folder_path)
+        current_match = re.match(r'^([a-zA-Z0-9]+)_audio_([a-zA-Z\-]+)$', current_folder)
+        if current_match:
+            return current_match.group(2)
+        
+        parent_folder = os.path.basename(os.path.dirname(folder_path))
+        parent_match = re.match(r'^([a-zA-Z0-9]+)_audio_([a-zA-Z\-]+)$', parent_folder)
+        if parent_match:
+            return parent_match.group(2)
+        
+        return "unknown"
+
     def merge(self):
-        if not os.path.exists(self.output_folder):
-            os.makedirs(self.output_folder)
+        def process_txt_files(folder_path, output_path, character_name, model_info=None):
+            if not model_info:
+                parent_folder = os.path.basename(os.path.dirname(folder_path))
+                prefix_match = re.match(r'^([a-zA-Z0-9]+)_audio_([a-zA-Z\-]+)$', parent_folder)
+                model_info = {
+                    'model_name': prefix_match.group(1) if prefix_match else 'unknown',
+                    'language': prefix_match.group(2) if prefix_match else 'unknown'
+                }
 
-        for group_folder in os.scandir(self.parent_folder):
-            if not group_folder.is_dir():
-                continue
+            txt_files = sorted([f for f in os.listdir(folder_path) if f.endswith('.txt')])
+            with open(output_path, 'w', encoding='utf-8') as outfile:
+                for txt_file in txt_files:
+                    file_path = os.path.join(folder_path, txt_file)
+                    try:
+                        with open(file_path, 'r', encoding='utf-8') as infile:
+                            content = infile.read()
+                            cleaned = self.clean_content(content)
+                            if self.text:
+                                real_path = self.text.format(
+                                    model_name=model_info['model_name'],
+                                    language=model_info['language'],
+                                    character_name=character_name
+                                )
+                                audio_path = os.path.join(real_path, txt_file.replace(".txt", ".wav")).replace("\\", "/")
+                            else:
+                                audio_path = txt_file.replace(".txt", ".wav").replace("\\", "/")
+                            outfile.write(f"{audio_path}|{character_name}|{model_info['language']}|{cleaned}\n")
+                    except Exception as e:
+                        print(f"读取失败: {file_path} 错误: {e}")
 
-            group_name = group_folder.name
-            prefix_match = re.match(r'^([a-zA-Z0-9]+)_audio_([a-zA-Z\-]+)$', group_name)
-            if not prefix_match:
-                print(f"文件夹名不符合格式，跳过: {group_name}")
-                continue
-            model_name = prefix_match.group(1)
-            language = prefix_match.group(2)
+        def has_txt_files(folder):
+            return any(f.name.endswith('.txt') for f in os.scandir(folder) if f.is_file())
 
-            group_output_folder = os.path.join(self.output_folder, group_name)
-            os.makedirs(group_output_folder, exist_ok=True)
+        def has_subfolders(folder):
+            return any(f.is_dir() for f in os.scandir(folder))
 
-            for character_folder in os.scandir(group_folder.path):
-                if not character_folder.is_dir():
-                    continue
+        if os.path.isdir(self.parent_folder):
+            if has_subfolders(self.parent_folder):
+                for model_folder in os.scandir(self.parent_folder):
+                    if not model_folder.is_dir():
+                        continue
+                    
+                    model_folder_name = model_folder.name
+                    audio_folder_match = re.match(r'^([a-zA-Z0-9]+)_audio_([a-zA-Z\-]+)$', model_folder_name)
+                    
+                    if audio_folder_match:
+                        model_name = audio_folder_match.group(1)
+                        language = audio_folder_match.group(2)
+                        model_output_folder = os.path.join(self.output_folder, model_folder_name)
+                        os.makedirs(model_output_folder, exist_ok=True)
+                        
+                        for character_folder in os.scandir(model_folder.path):
+                            if not character_folder.is_dir():
+                                continue
+                            
+                            character_name = character_folder.name
+                            output_file = os.path.join(model_output_folder, f"{character_name}_launcher_{language}.txt")
+                            
+                            if has_txt_files(character_folder.path):
+                                model_info = {
+                                    'model_name': model_name,
+                                    'language': language
+                                }
+                                process_txt_files(character_folder.path, output_file, character_name, model_info)
+                                print(f"文本合并完成 -> {output_file}")
+                        continue
+                    
+                    subfolder_name = model_folder_name
+                    language = self.get_language_from_path(model_folder.path)
+                    if os.path.exists(self.output_folder) and self.output_folder != os.path.join(os.getcwd(), "output/text"):
+                        output_file = os.path.join(self.output_folder, f"{subfolder_name}_launcher_{language}.txt")
+                    else:
+                        os.makedirs(self.output_folder, exist_ok=True)
+                        output_file = os.path.join(self.output_folder, f"{subfolder_name}_launcher_{language}.txt")
 
-                character_name = character_folder.name
-                txt_files = sorted([f for f in os.listdir(character_folder.path) if f.endswith('.txt')])
-                output_file = os.path.join(group_output_folder, character_name + '.txt')
+                    if has_txt_files(model_folder.path):
+                        process_txt_files(model_folder.path, output_file, subfolder_name)
+                        print(f"文本合并完成 -> {output_file}")
 
-                with open(output_file, 'w', encoding='utf-8') as outfile:
-                    for txt_file in txt_files:
-                        file_path = os.path.join(character_folder.path, txt_file)
-                        try:
-                            with open(file_path, 'r', encoding='utf-8') as infile:
-                                content = infile.read()
-                                cleaned = self.clean_content(content)
-                                if self.text:
-                                    real_path = self.text.format(
-                                        model_name=model_name,
-                                        language=language,
-                                        character_name=character_name
-                                    )
-                                    audio_path = os.path.join(real_path, txt_file.replace(".txt", ".wav")).replace("\\", "/")
-                                else:
-                                    audio_path = txt_file.replace(".txt", ".wav")
-                                outfile.write(f"{audio_path}|{character_name}|{language}|{cleaned}\n")
-                        except Exception as e:
-                            print(f"读取失败: {file_path} 错误: {e}")
-                print(f"{group_name}/{character_name} 合并完成 -> {output_file}")
+            elif has_txt_files(self.parent_folder):
+                folder_name = os.path.basename(self.parent_folder.rstrip("\\/"))
+                language = self.get_language_from_path(self.parent_folder)
+                
+                if os.path.exists(self.output_folder) and self.output_folder != os.path.join(os.getcwd(), "output/text"):
+                    output_file = os.path.join(self.output_folder, f"{folder_name}_launcher_{language}.txt")
+                else:
+                    os.makedirs(self.output_folder, exist_ok=True)
+                    output_file = os.path.join(self.output_folder, f"{folder_name}_launcher_{language}.txt")
+                
+                process_txt_files(self.parent_folder, output_file, folder_name)
+                print(f"文本合并完成 -> {output_file}")
+                return
 
-        print("所有子文件夹的合并任务完成！")
+            print("所有文件夹的合并任务完成！")
 
     def log(self, text):
         self.log_output.append(text)

@@ -11,7 +11,7 @@ from asyncio import Semaphore
 
 from tools.character_selector import CharacterSelector
 from tools.audio_converter import AudioConverter
-from tools.config import get_resource_path,CHARACTER_FILE_YUAN,CHARACTER_FILE_BENTIE
+from tools.config import get_resource_path,CHARACTER_FILE_YUAN,CHARACTER_FILE_BENTIE,URL_PATH
 from tools.LogWidget import LogWidget
 from tools.text_merger import TextMerger
 
@@ -215,13 +215,14 @@ class MainWindow(QMainWindow):
         
         semaphore = Semaphore(5)
 
-        async def limited_download(character):
+        async def limited_download(character,urls):
             async with semaphore:
                 async with aiohttp.ClientSession() as session:
-                    await download_module.fetch_character_data(session,character)
+                    await download_module.fetch_character_data(session,character,urls)
 
         try:
-            tasks = [limited_download(character) for character in self.selected_characters]
+            url = self.load_character_list(URL_PATH)
+            tasks = [limited_download(character,urls) for character in self.selected_characters for urls in url]
             await asyncio.gather(*tasks)
             print("所有下载任务完成！")
             QMessageBox.information(self, "完成", "下载完成！")
@@ -238,7 +239,7 @@ class MainWindow(QMainWindow):
         QMessageBox.information(
             self,
             "关于",
-            "本程序用于下载原神,崩铁角色语音。\n版本：v0.5.4\n\n"
+            "本程序用于下载原神,崩铁角色语音。\n版本：v0.5.5\n\n"
             "免责声明：\n"
             "本程序仅用于学习和交流目的，所有语音及文字内容的版权归原始版权所有者所有。\n"
             "请勿将本程序用于任何商业用途或违法行为。\n"
