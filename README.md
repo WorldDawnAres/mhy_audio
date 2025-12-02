@@ -55,22 +55,14 @@ mhy_audio
 │   │   ├── character_selector.py
 │   │   ├── text_merger.py
 │   │   ├── audio_converter.py
+│   │   ├── audio_download.py
+│   │   ├── proxy_manager.py
 │   │   ├── config.py
 │   │   ├── log_stream.py
 │   │   ├── ui.py
 │   │   └── LogWidget.py
 │   ├── /tool
 │   │   ├── ffmpeg.exe
-│   ├── /yuan
-│   │   ├── yuan_audio_download_en.py
-│   │   ├── yuan_audio_download_jp.py
-│   │   ├── yuan_audio_download_zh.py
-│   │   └── yuan_audio_download_ko.py
-│   ├── /bentie
-│   │   ├── bentie_audio_download_en.py
-│   │   ├── bentie_audio_download_jp.py
-│   │   ├── bentie_audio_download_zh.py
-│   │   └── bentie_audio_download_ko.py
 │   ├── main.py
 └── /README.md
 ```
@@ -114,7 +106,7 @@ mhy_audio
 >使用以下命令安装所需的Python库:
 
 ```bash
-pip install aiohttp beautifulsoup4 PySide6 qasync requests
+pip install aiohttp beautifulsoup4 PySide6 qasync requests cloudscraper
 pip install PyInstaller(可选)
 ```
 

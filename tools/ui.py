@@ -1,4 +1,5 @@
-import os, asyncio,aiohttp
+import os
+from threading import Thread
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QMessageBox,
     QWidget, QVBoxLayout,QStyleFactory
@@ -7,13 +8,14 @@ from PySide6.QtGui import QAction, QIcon,QPalette, QColor
 from qasync import asyncSlot
 from functools import partial
 from PySide6.QtCore import Qt
-from asyncio import Semaphore
 
 from tools.character_selector import CharacterSelector
 from tools.audio_converter import AudioConverter
 from tools.config import get_resource_path,CHARACTER_FILE_YUAN,CHARACTER_FILE_BENTIE,URL_PATH
 from tools.LogWidget import LogWidget
 from tools.text_merger import TextMerger
+from tools.audio_download import download_all as download_all_audio
+from tools.proxy_manager import check_proxies
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -68,7 +70,7 @@ class MainWindow(QMainWindow):
         download_menu.addAction(en_action)
 
         jp_action = QAction("日文", self)
-        jp_action.triggered.connect(lambda: self.download_selected_characters("jp"))
+        jp_action.triggered.connect(lambda: self.download_selected_characters("ja"))
         download_menu.addAction(jp_action)
 
         ko_action = QAction("韩文", self)
@@ -84,6 +86,15 @@ class MainWindow(QMainWindow):
         merge_text_action = QAction("合并文本", self)
         merge_text_action.triggered.connect(self.open_text_merger)
         tool_menu.addAction(merge_text_action)
+
+        merge_proxy_action = QAction("代理检测", self)
+        merge_proxy_action.triggered.connect(self.text_proxy_merger)
+        tool_menu.addAction(merge_proxy_action)
+
+        self.use_proxy_action = QAction("启用代理", self)
+        self.use_proxy_action.setCheckable(True)
+        self.use_proxy_action.setChecked(False)
+        tool_menu.addAction(self.use_proxy_action)
 
         theme_menu = menubar.addMenu("主题")
 
@@ -146,6 +157,20 @@ class MainWindow(QMainWindow):
     def open_text_merger(self):
         self.text_merger_window = TextMerger()
         self.text_merger_window.show()
+    
+    def text_proxy_merger(self):
+        urls = self.load_character_list(URL_PATH)
+        urls_to_use = [u.split('|')[0] if '|' in u else u for u in urls]
+        if not urls_to_use:
+            print("⚠️ 没有可用 URL 进行代理测试")
+            return
+        url = urls_to_use[0].rstrip('/')
+        base= f"{url}/Honkai:_Star_Rail_Wiki"
+        def task():
+            stable_proxies = check_proxies(url_to_test=base, log_func= print, rounds=5)
+            for p in stable_proxies:
+                print(p)
+        Thread(target=task, daemon=True).start()
 
     def open_character_selector(self, game_name):
         self.selected_game = game_name
@@ -158,76 +183,45 @@ class MainWindow(QMainWindow):
 
     @asyncSlot(str)
     async def download_selected_characters(self, language="zh"):
+        if not self.selected_game:
+            self.log_widget.append_text("⚠️ 请先选择游戏！")
+            return
+
         if not self.selected_characters:
             reply = QMessageBox.question(
                 self,
                 "未选择角色",
-                "你尚未选择任何角色，程序将默认下载原神全部角色，是否下载全部角色？",
+                "你尚未选择任何角色，程序将默认下载当前指定游戏的全部角色，是否继续？",
                 QMessageBox.Yes | QMessageBox.No
             )
-            if reply == QMessageBox.Yes:
-                if self.selected_game == "yuan":
-                    CHARACTER_FILE = CHARACTER_FILE_YUAN
-                elif self.selected_game == "bentie":
-                    CHARACTER_FILE = CHARACTER_FILE_BENTIE
-                else:
-                    CHARACTER_FILE = CHARACTER_FILE_YUAN
-
-                self.selected_characters = self.load_character_list(CHARACTER_FILE)
-            else:
+            if reply != QMessageBox.Yes:
                 return
 
-        print(f"开始下载语音文件（游戏：{self.selected_game}，语言：{language}）...")
-
-        if not self.selected_game:
-            self.log_widget.append_text("请先选择游戏！")
-            return
-
-        try:
             if self.selected_game == "yuan":
-                if language == 'zh':
-                    import yuan.yuan_audio_download_zh as download_module
-                elif language == 'en':
-                    import yuan.yuan_audio_download_en as download_module
-                elif language == 'jp':
-                    import yuan.yuan_audio_download_jp as download_module
-                elif language == 'ko':
-                    import yuan.yuan_audio_download_ko as download_module
-                else:
-                    raise ImportError("语言不支持")
+                character_file = CHARACTER_FILE_YUAN
             elif self.selected_game == "bentie":
-                if language == 'zh':
-                    import bentie.bentie_audio_download_zh as download_module
-                elif language == 'en':
-                    import bentie.bentie_audio_download_en as download_module
-                elif language == 'jp':
-                    import bentie.bentie_audio_download_jp as download_module
-                elif language == 'ko':
-                    import bentie.bentie_audio_download_ko as download_module
-                else:
-                    raise ImportError("语言不支持")
+                character_file = CHARACTER_FILE_BENTIE
             else:
-                raise ImportError("未知游戏标记")
+                self.log_widget.append_text(f"⚠️ 不支持的游戏类型: {self.selected_game}")
+                return
 
-        except ImportError as e:
-            print(f"导入下载模块失败：{e}")
-            return
-        
-        semaphore = Semaphore(5)
+            self.selected_characters = self.load_character_list(character_file)
 
-        async def limited_download(character,urls):
-            async with semaphore:
-                async with aiohttp.ClientSession() as session:
-                    await download_module.fetch_character_data(session,character,urls)
+        urls = self.load_character_list(URL_PATH)
+        use_proxy = self.use_proxy_action.isChecked()
 
         try:
-            url = self.load_character_list(URL_PATH)
-            tasks = [limited_download(character,urls) for character in self.selected_characters for urls in url]
-            await asyncio.gather(*tasks)
-            print("所有下载任务完成！")
-            QMessageBox.information(self, "完成", "下载完成！")
+            await download_all_audio(
+                character_names=self.selected_characters,
+                urls=urls,
+                language=language,
+                game=self.selected_game,
+                log_func=self.log_widget.append_text,
+                use_proxy=use_proxy
+            )
+            QMessageBox.information(self, "完成", "所有下载任务完成！")
         except Exception as e:
-            print(f"下载过程中出现错误：{e}")
+            self.log_widget.append_text(f"⚠️ 下载过程中出现错误：{e}")
     
     def load_character_list(self, character_file):
         if not os.path.exists(character_file):
@@ -239,7 +233,7 @@ class MainWindow(QMainWindow):
         QMessageBox.information(
             self,
             "关于",
-            "本程序用于下载原神,崩铁角色语音。\n版本：v0.5.5\n\n"
+            "本程序用于下载原神,崩铁角色语音。\n版本：v0.6\n\n"
             "免责声明：\n"
             "本程序仅用于学习和交流目的，所有语音及文字内容的版权归原始版权所有者所有。\n"
             "请勿将本程序用于任何商业用途或违法行为。\n"
