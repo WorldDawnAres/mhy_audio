@@ -97,7 +97,7 @@ mhy_audio
 >
 >将文件放在/fonts文件夹下并自行修改config.py中的字体路径即可
 >
-[点击下载本程序使用字体原地址](https://github.com/adobe-fonts/source-han-serif)
+[点击下载本程序使用字体原地址](https://github.com/adobe-fonts/source-han-sans/releases)
 
 ## 安装和运行方式
 
@@ -120,7 +120,7 @@ pip install PyInstaller(可选)
 >
 >1.你需要在ffmpeg官网下载ffmpeg(以下方法适用于windows)
 
-[点击此处下载ffmpeg](https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.0.2-full_build.7z)
+[点击此处下载ffmpeg](https://github.com/GyanD/codexffmpeg/releases/download/7.0.2/ffmpeg-7.0.2-full_build.7z)
 >2.在上面链接下载后将压缩包解压并找到bin里的ffmpeg.exe解压到/mhy_audio/tool/ 目录下(若没有创建文件夹则自行创建)
 >
 >3.然后使用以下命令打包程序：
