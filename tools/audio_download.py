@@ -93,7 +93,7 @@ async def download_audio(session, audio_url, audio_file_name, status, proxy=None
         return None
 
 # -------------------- 抓取角色 --------------------
-async def fetch_character_data(session, character_name, url, language="zh", proxy=None, scraper=None, log_func: callable = None):
+async def fetch_character_data(session, character_name, url, language="zh", proxy=None, scraper=None, log_func: callable = None, game=""):
     log = print if log_func is None else log_func
     await asyncio.sleep(random.uniform(2, 5))
 
@@ -119,7 +119,14 @@ async def fetch_character_data(session, character_name, url, language="zh", prox
     else:
         new_url = f"{base}/{english_name}/Voice-Overs" if base.endswith('/wiki') else f"{base}/wiki/{english_name}/Voice-Overs"
     
-    download_directory = os.path.join(get_base_path(), "audio", f"bentie_audio_{language}")
+    if game == "bentie":
+        base_folder_name = f"bentie_audio_{language}"
+    elif game == "yuan":
+        base_folder_name = f"yuan_audio_{language}"
+    else:
+        base_folder_name = f"audio_{language}"
+
+    download_directory = os.path.join(get_base_path(), "audio", base_folder_name)
     os.makedirs(download_directory, exist_ok=True)
 
     character_folder = os.path.join(download_directory, clean_filename(folder_name))
@@ -193,11 +200,19 @@ async def fetch_character_data(session, character_name, url, language="zh", prox
         if not th_tag or not td_tag:
             continue
 
-        audio_title = th_tag.get("id", "unknown")
+        div_id_tag = th_tag.find("div", id=True)
+        span_en = th_tag.find("span", {"lang": "en"})
+        if div_id_tag:
+            audio_title = div_id_tag["id"]
+        elif span_en:
+            audio_title = span_en.get_text(strip=True)
+        else:
+            audio_title = th_tag.get("id", "unknown")
+
         audio_file_name = os.path.join(character_folder, f"{clean_filename(audio_title)}.ogg")
         text_file_name = os.path.splitext(audio_file_name)[0] + ".txt"
 
-        text_tag = td_tag.find("span", lang=language)
+        text_tag = td_tag.find("span", {"lang": language})
         if not text_tag:
             continue
         text_content = text_tag.get_text(strip=True)
@@ -207,8 +222,8 @@ async def fetch_character_data(session, character_name, url, language="zh", prox
         audio_tag = td_tag.find("audio")
         if not audio_tag or not audio_tag.get("src"):
             continue
-        audio_url = audio_tag["src"]
-        audio_url = urljoin(new_url, audio_url)
+
+        audio_url = urljoin(new_url, audio_tag["src"])
 
         tasks.append(download_audio(session, audio_url, audio_file_name, status, proxy=proxy, log_func=log))
         total_audio += 1
@@ -280,7 +295,7 @@ async def download_all(character_names: list[str], urls: list[str], language="zh
     async with aiohttp.ClientSession(headers={"User-Agent": random.choice(USER_AGENTS)}, connector=connector) as session:
         for idx, name in enumerate(character_names, 1):
             for u in urls_to_use:
-                await fetch_character_data(session, name, u, language=language, proxy=working_proxy, scraper=SCRAPER, log_func=log)
+                await fetch_character_data(session, name, u, language=language, proxy=working_proxy, scraper=SCRAPER, log_func=log, game=game)
             await asyncio.sleep(random.uniform(2, 5))
             if idx % 5 == 0:
                 log("⏸ 批量抓取完成 5 个角色，额外等待 5~10 秒")
